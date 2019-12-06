@@ -12,8 +12,8 @@ class Control:
         """Update graph and animation.
         Here modeling a Barabasi-Albert graph.
         """
-        graph = self.model.update()
-        self.view.draw(graph)
+        self.model.update()
+        self.view.draw(self.model)
 
     def run(self):
         self.view.run(self.update)

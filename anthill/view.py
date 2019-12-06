@@ -11,30 +11,36 @@ class View:
     def __init__(self):
         self.figure, self.axis = plt.subplots()
         self.positions = {}
-        self.old_nodes = []
 
     def draw(self, model):
         """Draw updated graph, holding old nodes into place."""
         graph = model.graph
-        self.axis.clear()
-        degrees = [len(adj[1]) for adj in graph.adjacency()]
+        ant = model.ant
+        sugar = model.sugar
+        nest = model.nest
 
-        hold = {}
-        if self.positions:
-            hold.update(pos=self.positions, fixed=self.old_nodes)
-        self.positions = nx.spring_layout(graph, **hold)
+        self.axis.clear()
+        colors = ["w"] * len(graph.nodes)
+        colors[nest] = "b"
+        colors[sugar] = "r"
+        colors[ant] = "k"
+
+        if not self.positions:
+            self.positions = nx.spring_layout(graph)
+
+        weights = [graph[u][v]["weight"] / 5 for u, v in graph.edges()]
 
         nx.draw(
             graph,
             ax=self.axis,
             pos=self.positions,
             node_size=50,
-            node_color=degrees,
-            cmap=plt.cm.bwr,
+            node_color=colors,
+            width=weights,
+            arrows=True,
         )
-        self.old_nodes = list(graph.nodes)
 
     def run(self, update):
         """Run animation of given function."""
-        anim = ani.FuncAnimation(self.figure, update, interval=50)
+        anim = ani.FuncAnimation(self.figure, update, interval=10)
         plt.show()

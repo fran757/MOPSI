@@ -16,4 +16,3 @@ class Barabasi:
         n = self.graph.number_of_nodes()
         connect = np.random.choice(n, p=degrees / sum(degrees))
         self.graph.add_edge(connect, n)
-        return self.graph
