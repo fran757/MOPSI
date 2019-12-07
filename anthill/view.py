@@ -15,7 +15,7 @@ class View:
     def draw(self, model):
         """Draw updated graph, holding old nodes into place."""
         graph = model.graph
-        ant = model.ant
+        ants = model.ants
         sugar = model.sugar
         nest = model.nest
 
@@ -23,7 +23,8 @@ class View:
         colors = ["w"] * len(graph.nodes)
         colors[nest] = "b"
         colors[sugar] = "r"
-        colors[ant] = "k"
+        for ant in ants:
+            colors[ant.position] = "k"
 
         if not self.positions:
             self.positions = nx.spring_layout(graph)
@@ -34,7 +35,7 @@ class View:
             graph,
             ax=self.axis,
             pos=self.positions,
-            node_size=50,
+            node_size=30,
             node_color=colors,
             width=weights,
             arrows=True,

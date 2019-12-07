@@ -16,4 +16,5 @@ class Control:
         self.view.draw(self.model)
 
     def run(self):
+        """Start simulation."""
         self.view.run(self.update)

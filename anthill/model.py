@@ -1,39 +1,73 @@
-"""Model an evolving graph."""
+"""Ants try to find a short path from nest to sugar."""
 
 import networkx as nx
 import numpy as np
 
 
+class Ant:
+    """Ant knows its position and history."""
+    def __init__(self, position):
+        self.history = []
+        self.position = position
+
+    @property
+    def position(self):
+        """Current position is last in history."""
+        return self.history[-1]
+
+    @position.setter
+    def position(self, value):
+        """A closed loop can be forgotten."""
+        if value in self.history:
+            self.history = self.history[: self.history.index(value)]
+        self.history.append(self.position)
+
+    def reset(self, position):
+        """Forget everything and start back in position."""
+        self.history = []
+        self.position = position
+
+
 class Anthill:
-    """First attempt of anthill simulation."""
+    """A few ants try to link the nest to sugar."""
 
     def __init__(self):
-        self.graph = nx.erdos_renyi_graph(8, 0.5, directed=True)
+        self.graph = nx.erdos_renyi_graph(20, 0.3, directed=True)
         for edge in self.graph.edges(data=True):
             edge[2].update(weight=1)
         self.sugar = len(self.graph.nodes) - 1
         self.nest = 0
-        self.ant = self.nest
-        self.history = [self.ant]
+        self.ants = [Ant(self.nest) for _ in range(5)]
 
-    def update(self):
-        """A new node is attached to an existing high-degree node."""
-        if self.ant == self.sugar:
-            for u, v in zip(self.history[:-1], self.history[1:]):
-                assert (u, v) in self.graph.edges
-                self.graph[u][v]["weight"] += 1 / len(self.history)
-            self.ant = self.nest
-            self.history = [self.ant]
+    def reinforce(self, path):
+        """Reinforce a successful path."""
+        for u, v in zip(path[:-1], path[1:]):
+            assert (u, v) in self.graph.edges
+            self.graph[u][v]["weight"] += 1 / len(path)
 
-        out_edges = self.graph.out_edges(self.ant)
+    def update_ant(self, ant):
+        """Move ant according to neighboring edge weights.
+        Upon reaching sugar or getting stuck, ant immediately gets back to work.
+        """
+        if ant.position == self.sugar:
+            self.reinforce(ant.history)
+            ant.reset(self.nest)
+            # return
+
+        out_edges = self.graph.out_edges(ant.position)
+        if not out_edges:
+            ant.reset(self.nest)
+            # return
+
         neighbors = [v for _, v in out_edges]
         weights = np.array([self.graph[u][v]["weight"] for u, v in out_edges])
 
-        self.ant = np.random.choice(neighbors, p=weights / sum(weights))
+        ant.position = np.random.choice(neighbors, p=weights / sum(weights))
 
-        self.history.append(self.ant)
-        if self.ant in self.history[:-1]:
-            self.history = self.history[: self.history.index(self.ant) + 1]
+    def update(self):
+        """Move ants around."""
+        for ant in self.ants:
+            self.update_ant(ant)
 
 
 if __name__ == "__main__":

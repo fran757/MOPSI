@@ -6,8 +6,8 @@ Give package name as arguments :
     $ ./main.py barabasi
 """
 
-from control import Control
 from importlib import import_module
+from control import Control
 
 
 def main(*args):
@@ -26,4 +26,5 @@ def main(*args):
 
 if __name__ == "__main__":
     import sys
+
     main(*sys.argv)
