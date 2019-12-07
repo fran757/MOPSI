@@ -20,7 +20,7 @@ class Ant:
         """A closed loop can be forgotten."""
         if value in self.history:
             self.history = self.history[: self.history.index(value)]
-        self.history.append(self.position)
+        self.history.append(value)
 
     def reset(self, position):
         """Forget everything and start back in position."""
