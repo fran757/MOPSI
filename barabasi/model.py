@@ -13,6 +13,7 @@ class Barabasi:
     def update(self):
         """A new node is attached to an existing high-degree node."""
         degrees = np.array(list(self.graph.degree()))[:, 1]
-        n = self.graph.number_of_nodes()
-        connect = np.random.choice(n, p=degrees / sum(degrees))
-        self.graph.add_edge(connect, n)
+        connect = np.random.choice(
+            self.graph.number_of_nodes(), p=degrees / sum(degrees)
+        )
+        self.graph.add_edge(connect, self.graph.number_of_nodes())

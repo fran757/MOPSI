@@ -6,6 +6,7 @@ import numpy as np
 
 class Ant:
     """Ant knows its position and history."""
+
     def __init__(self, position):
         self.history = []
         self.position = position
@@ -32,7 +33,7 @@ class Anthill:
     """A few ants try to link the nest to sugar."""
 
     def __init__(self):
-        self.graph = nx.erdos_renyi_graph(20, 0.3, directed=True)
+        self.graph = nx.erdos_renyi_graph(40, .1)#, directed=True)
         for edge in self.graph.edges(data=True):
             edge[2].update(weight=1)
         self.sugar = len(self.graph.nodes) - 1
@@ -46,18 +47,18 @@ class Anthill:
             self.graph[u][v]["weight"] += 1 / len(path)
 
     def update_ant(self, ant):
-        """Move ant according to neighboring edge weights.
-        Upon reaching sugar or getting stuck, ant immediately gets back to work.
-        """
+        """Move ant according to neighboring edge weights."""
         if ant.position == self.sugar:
             self.reinforce(ant.history)
             ant.reset(self.nest)
-            # return
+            return
 
-        out_edges = self.graph.out_edges(ant.position)
-        if not out_edges:
+        out_edges = self.graph.edges(ant.position)
+        if not list(out_edges):
+            if ant.position == self.nest:
+                raise ValueError("nest is isolated")
             ant.reset(self.nest)
-            # return
+            return
 
         neighbors = [v for _, v in out_edges]
         weights = np.array([self.graph[u][v]["weight"] for u, v in out_edges])

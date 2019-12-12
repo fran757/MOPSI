@@ -4,6 +4,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 
+from timer import clock
+
 
 class View:
     """Spring layout graph representation."""
@@ -13,6 +15,7 @@ class View:
         self.positions = {}
         self.old_nodes = []
 
+    @clock
     def draw(self, graph, **kwargs):
         """Draw updated graph, holding old nodes into place."""
         hold = {}
@@ -29,5 +32,8 @@ class View:
 
     def run(self, update):
         """Run animation of given function."""
-        anim = ani.FuncAnimation(self.figure, update, interval=10)
+        anim = ani.FuncAnimation(self.figure, update, interval=0)
+        self.show()
+
+    def show(self):
         plt.show()
