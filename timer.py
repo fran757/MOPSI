@@ -6,6 +6,7 @@ class Clock:
     Instance registration by function name.
     Report average of each set of records.
     """
+
     _known = {}
 
     @classmethod
@@ -34,14 +35,20 @@ class Clock:
         return records
 
 
+def name(fun):
+    return f"{fun.__module__} / {fun.__qualname__}"
+
+
 def clock(fun):
     """Clock decorator : register 'fun' execution times.
     Closure preserves method identity.
     """
+
     def timed(*args, **kwargs):
         before = time()
         value = fun(*args, **kwargs)
         now = time()
-        Clock.provide(fun.__qualname__).record(now - before)
+        Clock.provide(name(fun)).record(now - before)
         return value
+
     return timed

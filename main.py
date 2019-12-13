@@ -8,7 +8,8 @@ Give package name as an argument :
     $ ./main.py -a barabasi
 """
 
-from importlib import import_module
+import importlib
+import re
 from control import Control
 
 
@@ -21,13 +22,12 @@ def main(*args):
         if arg == "-a":
             animate = True
         else:
-            name = arg
+            name = re.sub("[^a-zA-Z_]", "", arg)
 
-    try:
-        package = import_module(name)
-        Control(package.Model, package.View, animate).run()
-    except ModuleNotFoundError:
-        print(f"No module found with name '{name}'.")
+    if importlib.find_loader(name) is None:
+        raise ModuleNotFoundError(f"Package '{name}' wasn't found.")
+    package = importlib.import_module(name)
+    Control(package.Model, package.View).run(animate)
 
 
 if __name__ == "__main__":
@@ -36,5 +36,4 @@ if __name__ == "__main__":
 
     main(*sys.argv)
     for name, (n, time) in Clock.report().items():
-        print(f"{name} (x{n}): {time:.3f}")
-
+        print(f"{name} (x{n}): {time:.3f} s")
