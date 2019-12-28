@@ -24,7 +24,7 @@ def main(*args):
         else:
             name = re.sub("[^a-zA-Z_]", "", arg)
 
-    if importlib.find_loader(name) is None:
+    if importlib.util.find_spec(name) is None:
         raise ModuleNotFoundError(f"Package '{name}' wasn't found.")
     package = importlib.import_module(name)
     Control(package.Model, package.View).run(animate)
