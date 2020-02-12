@@ -9,6 +9,7 @@ from timer import clock
 
 class View:
     """Spring layout graph representation."""
+    spring=True
 
     def __init__(self):
         self.figure, self.axis = plt.subplots()
@@ -18,11 +19,15 @@ class View:
     @clock
     def draw(self, graph, **kwargs):
         """Draw updated graph, holding old nodes into place."""
-        hold = {}
-        if self.positions:
-            hold.update(pos=self.positions, fixed=self.old_nodes)
-        if not self.positions or len(self.old_nodes) != len(graph.nodes):
-            self.positions = nx.spring_layout(graph, **hold)
+        if self.spring:
+            hold = {}
+            if self.positions:
+                hold.update(pos=self.positions, fixed=self.old_nodes)
+            if not self.positions or len(self.old_nodes) != len(graph.nodes):
+                self.positions = nx.spring_layout(graph, **hold)
+        else:
+            self.positions = {node: node for node in graph.nodes}
+
         self.old_nodes = list(graph.nodes)
 
         self.axis.clear()

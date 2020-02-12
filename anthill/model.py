@@ -33,11 +33,25 @@ class Anthill:
     """A few ants try to link the nest to sugar."""
 
     def __init__(self):
-        self.graph = nx.erdos_renyi_graph(40, .1)#, directed=True)
+        self.graph = nx.grid_graph([5, 5]).to_directed()
+        self.graph = nx.DiGraph()
+        n = 4
+        nodes = np.indices((n, n)).reshape((2, -1)).T
+        neighbors = np.indices((3, 3)).reshape((2, -1)).T - 1
+        self.graph.add_nodes_from([(i, j) for i, j in nodes])
+        for u in nodes:
+            for d in neighbors:
+                if np.all(d == 0):
+                    continue
+                v = u + d
+                if np.all(0 <= v) and np.all(v < n):
+                    self.graph.add_edge(tuple(u), tuple(v))
+
+        # self.graph = nx.erdos_renyi_graph(40, .1)#, directed=True)
         for edge in self.graph.edges(data=True):
             edge[2].update(weight=1)
-        self.sugar = len(self.graph.nodes) - 1
-        self.nest = 0
+        self.sugar = (n - 1, n - 1)
+        self.nest = (0, 0)
         self.ants = [Ant(self.nest) for _ in range(5)]
 
     def reinforce(self, path):
@@ -62,8 +76,9 @@ class Anthill:
 
         neighbors = [v for _, v in out_edges]
         weights = np.array([self.graph[u][v]["weight"] for u, v in out_edges])
-
-        ant.position = np.random.choice(neighbors, p=weights / sum(weights))
+        weights = weights / sum(weights)
+        choice = np.random.choice(len(neighbors), p=weights)
+        ant.position = neighbors[choice]
 
     def update(self):
         """Move ants around."""
