@@ -14,7 +14,7 @@ class View(view.View):
         sugar = model.sugar
         nest = model.nest
 
-        colors = {node: "w" for node in graph.nodes}
+        colors = {node: "y" for node in graph.nodes}
         colors[nest] = "b"
         colors[sugar] = "r"
         for ant in ants:
