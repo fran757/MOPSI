@@ -23,7 +23,7 @@ class Control:
             self.view.run(update)
         else:
             for _ in range(10):
-                model = self.Model()
+                model = self.model
                 for _ in range(1000):
                     clock(self.model.update)()
                 clock(self.view.draw)(self.model)
